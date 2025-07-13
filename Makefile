@@ -50,7 +50,8 @@ test: ## 测试服务
 	@echo "🧪 测试服务..."
 	@if curl -f -s http://localhost:$(EXTERNAL_PORT)/health > /dev/null; then \
 		echo "✅ 服务运行正常！"; \
-		echo "🌐 访问地址: http://localhost:$(EXTERNAL_PORT)"; \
+		echo "🌐 主页: http://localhost:$(EXTERNAL_PORT)/"; \
+		echo "👋 Hello: http://localhost:$(EXTERNAL_PORT)/hello"; \
 		echo "❤️ 健康检查: http://localhost:$(EXTERNAL_PORT)/health"; \
 		echo "📊 指标: http://localhost:$(EXTERNAL_PORT)/metrics"; \
 		echo "📋 版本信息:"; \

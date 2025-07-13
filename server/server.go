@@ -43,7 +43,7 @@ func (s *Server) setupRoutes() {
 	logMiddleware := middleware.LoggingMiddleware(s.logger)
 
 	// 主要处理器，带日志中间件
-	mux.HandleFunc("/", logMiddleware(s.handlers.Hello))
+	mux.HandleFunc("/hello", logMiddleware(s.handlers.Hello))
 
 	// 健康检查端点
 	mux.HandleFunc("/health", logMiddleware(s.handlers.Health))
@@ -53,6 +53,9 @@ func (s *Server) setupRoutes() {
 
 	// 指标端点
 	mux.HandleFunc("/metrics", logMiddleware(s.handlers.Metrics))
+
+	// 404 处理器
+	mux.HandleFunc("/", logMiddleware(s.handlers.RootHandler))
 
 	s.server = &http.Server{
 		Addr:         fmt.Sprintf(":%d", s.config.Port),

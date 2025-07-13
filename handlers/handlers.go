@@ -2,10 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"runtime"
 	"time"
 
 	"test_podman/types"
@@ -52,6 +51,46 @@ func (h *Handlers) Hello(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+}
+
+// RootHandler 智能根路径处理器
+func (h *Handlers) RootHandler(w http.ResponseWriter, r *http.Request) {
+	// 只处理精确的根路径
+	if r.URL.Path == "/" {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		
+		ver, buildTime := version.GetVersion()
+		response := map[string]interface{}{
+			"service":    "Test Podman Web Server",
+			"version":    ver,
+			"build_time": buildTime,
+			"endpoints": map[string]string{
+				"hello":   "/hello",
+				"health":  "/health",
+				"ready":   "/ready",
+				"metrics": "/metrics",
+			},
+			"uptime": time.Since(h.startTime).String(),
+		}
+		
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			h.logger.Printf("Error encoding response: %v", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+	
+	// 其他路径返回 404
+	http.NotFound(w, r)
 }
 
 // Health 处理健康检查请求
@@ -115,7 +154,7 @@ func (h *Handlers) Metrics(w http.ResponseWriter, r *http.Request) {
 		"timestamp":      time.Now().Unix(),
 		"version":        ver,
 		"build_time":     buildTime,
-		"go_version":     fmt.Sprintf("%s", os.Getenv("GO_VERSION")),
+		"go_version":     runtime.Version(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
