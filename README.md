@@ -31,16 +31,27 @@
 
 ## 📦 项目结构
 
+本项目采用模块化架构设计，具体的架构说明和目录结构请参考：
+
+📋 **[项目架构文档](docs/ARCHITECTURE.md)** - 详细的模块结构和架构说明
+
+### 核心模块
 ```
 test_podman/
-├── main.go              # 主应用程序代码
-├── go.mod              # Go模块定义
-├── go.sum              # Go模块校验和
-├── Dockerfile          # Docker构建文件
-├── docker-compose.yml  # Docker Compose配置
-├── .env               # 环境变量配置（包含版本号）
-├── Makefile           # 自动化构建和部署命令
-└── README.md          # 项目文档
+├── config/              # 配置管理模块
+├── handlers/            # HTTP处理器模块
+├── middleware/          # 中间件模块
+├── server/              # 服务器管理模块
+├── types/               # 类型定义模块
+├── version/             # 版本管理模块
+├── docs/                # 项目文档
+├── scripts/             # 清理和工具脚本
+├── main.go              # 应用程序入口
+├── Dockerfile           # Docker构建文件
+├── docker-compose.yml   # Docker Compose配置
+├── .env                 # 环境变量配置
+├── Makefile             # 自动化构建命令
+└── README.md            # 项目文档
 ```
 
 ## 🔧 配置选项
@@ -313,7 +324,39 @@ ab -n 1000 -c 10 http://localhost:15667/
 
 ## 📝 更新日志
 
-### v1.0.3 (当前版本)
+### v1.1.0 (当前版本) - 2025-07-13
+🎆 **重大版本更新 - 模块化重构与智能化管理**
+
+#### ✨ 新增特性
+- ✅ **模块化架构**: 将单一 main.go 拆分为 7 个专门模块
+  - `config/`: 配置管理模块
+  - `handlers/`: HTTP处理器模块
+  - `middleware/`: 中间件模块
+  - `server/`: 服务器管理模块
+  - `types/`: 类型定义模块
+  - `version/`: 版本管理模块
+- ✅ **智能清理系统**: 解决容器镜像堆积问题
+- ✅ **清理脚本**: `scripts/cleanup.sh` 多策略清理工具
+- ✅ **技术文档**: 完善的架构说明和 Scratch 镜像详解
+
+#### 🔧 新增命令
+- `make smart-clean`: 智能清理(保留最新3个版本)
+- `make clean-dangling`: 清理悬挂镜像
+- `make show-images`: 显示镜像状态
+- `make clean-all-images`: 清理所有未使用镜像
+- `make system-prune`: 系统级清理
+
+#### 📚 文档增强
+- `docs/ARCHITECTURE.md`: 模块化架构详解
+- `docs/SCRATCH_IMAGE_EXPLAINED.md`: Scratch 镜像原理说明
+
+#### 🚀 优化改进
+- ✅ 自动化镜像清理: 构建后自动清理悬挂镜像
+- ✅ 模块化设计: 更好的可维护性和可测试性
+- ✅ 代码结构: 职责分离，模块独立
+- ✅ 开发体验: 彩色输出和用户友好的命令
+
+### v1.0.3
 - ✅ 统一版本管理系统
 - ✅ 自动化 Makefile 部署命令
 - ✅ 版本信息自动注入
