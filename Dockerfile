@@ -23,7 +23,7 @@ COPY . .
 
 # 使用优化选项构建应用程序，并将版本信息编译进二进制文件
 RUN CGO_ENABLED=${CGO_ENABLED} GOOS=linux GOARCH=amd64 go build \
-    -ldflags="-w -s -extldflags '-static' -X 'main.Version=${VERSION}' -X 'main.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)'" \
+    -ldflags="-w -s -extldflags '-static' -X 'test_podman/version.Version=${VERSION}' -X 'test_podman/version.BuildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)'" \
     -a -installsuffix cgo \
     -o main .
 
