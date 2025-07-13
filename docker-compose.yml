@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web-server:
+    build:
+      context: .
+      args:
+        - VERSION=${VERSION}
+        - GO_VERSION=${GO_VERSION}
+        - CGO_ENABLED=${CGO_ENABLED}
+    image: test_podman_web-server:${VERSION}
+    network_mode: slirp4netns
+    ports:
+      - "${EXTERNAL_PORT}:${INTERNAL_PORT}"
+    environment:
+      - PORT=${INTERNAL_PORT}
+      - READ_TIMEOUT=${READ_TIMEOUT}
+      - WRITE_TIMEOUT=${WRITE_TIMEOUT}
+      - IDLE_TIMEOUT=${IDLE_TIMEOUT}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - VERSION=${VERSION}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5667/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    # networks:
+    #   - web-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+
+# networks:
+#   web-network:
+#     driver: bridge
