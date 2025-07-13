@@ -12,6 +12,8 @@ help: ## 显示帮助信息
 build: ## 构建镜像
 	@echo "🔨 构建镜像 (版本: $(VERSION))..."
 	podman compose build --no-cache
+	@echo "🧹 清理悬挂镜像..."
+	podman image prune -f
 
 .PHONY: up
 up: ## 启动服务
@@ -111,12 +113,40 @@ quick-deploy: ## 快速部署 (仅重启，不重新构建)
 	make restart
 	make test
 
+.PHONY: clean-dangling
+clean-dangling: ## 清理悬挂镜像 (<none> 镜像)
+	@echo "🧹 清理悬挂镜像..."
+	podman image prune -f
+	@echo "✅ 悬挂镜像清理完成"
+
+.PHONY: clean-all-images
+clean-all-images: ## 清理所有未使用的镜像
+	@echo "🧹 清理所有未使用的镜像..."
+	podman image prune -a -f
+	@echo "✅ 所有未使用镜像清理完成"
+
+.PHONY: smart-clean
+smart-clean: ## 🧠 智能清理 (推荐) - 保留最新3个版本
+	@chmod +x scripts/cleanup.sh
+	./scripts/cleanup.sh --smart
+
+.PHONY: show-images
+show-images: ## 📊 显示镜像状态
+	@chmod +x scripts/cleanup.sh
+	./scripts/cleanup.sh --show
+
+.PHONY: system-prune
+system-prune: ## 系统级清理 (容器、镜像、网络、卷)
+	@chmod +x scripts/cleanup.sh
+	./scripts/cleanup.sh --all
+
 .PHONY: full-clean
 full-clean: clean ## 完全清理 (包括停止所有相关容器)
 	@echo "🧹 完全清理..."
 	podman stop $$(podman ps -q --filter "ancestor=test_podman_web-server") 2>/dev/null || true
 	podman rm $$(podman ps -aq --filter "ancestor=test_podman_web-server") 2>/dev/null || true
 	podman rmi $$(podman images -q test_podman_web-server) 2>/dev/null || true
+	make clean-dangling
 
 # 默认目标
 .DEFAULT_GOAL := help
