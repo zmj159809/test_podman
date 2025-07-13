@@ -42,3 +42,6 @@ data/
 
 # Logs
 *.log
+
+# Internal documentation
+Podman非root环境部署总结.md
